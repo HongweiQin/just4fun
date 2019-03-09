@@ -19,7 +19,7 @@ struct workqueue_struct *wq;
 
 This is a workqueue. BUT, one `struct workqueue_struct' contains a set of queues, each corresponds to one cpu.
 
-For example, if we have 4 cpus, one `struct workqueue_struct' actually measn 4 queues.
+For example, if we have 4 cpus, one `struct workqueue_struct' actually means 4 queues.
 
 
 ```
