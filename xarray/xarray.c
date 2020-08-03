@@ -21,6 +21,7 @@ static ssize_t xa_test_write(struct file *file,
 	char usrCommand[512];
 	int ret;
 	unsigned long key, value;
+	void *pvalue;
 
 	ret = copy_from_user(usrCommand, buffer, count);
 	switch (usrCommand[0]) {
@@ -30,7 +31,19 @@ static ssize_t xa_test_write(struct file *file,
 		break;
 	case 'b':
 		sscanf(&usrCommand[1], "%lu%lu", &key, &value);
-		pr_notice("insert, key=%lu, value=%lu\n", key, value);
+		pr_notice("store, key=%lu, value=%lu\n", key, value);
+		xa_store(&test_xa, key, xa_mk_value(value), GFP_KERNEL);
+		break;
+	case 'c':
+		sscanf(&usrCommand[1], "%lu", &key);
+		value = xa_to_value(xa_load(&test_xa, key));
+		pr_notice("load, key=%lu, value=%lu\n", key, value);
+		break;
+	case 'd':
+		//WARNING: O(n.logn), xas for each is more efficient.
+		xa_for_each(&test_xa, key, pvalue) {
+			pr_notice("Iterate, key=%lu, value=%lu\n", key, xa_to_value(pvalue));
+		}
 		break;
 	case 'z':
 		pr_notice("xa destroy\n");
